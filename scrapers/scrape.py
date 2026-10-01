@@ -41,9 +41,15 @@ for page in range(START_PAGE, END_PAGE):
         price_tag = card.find('span', {'aria-label': 'Price'})
         price = price_tag.get_text(strip=True) if price_tag else None
 
-        if price:
+        loc_tag = card.find('div', {'aria-label': 'Location'})
+        location = loc_tag.get_text(strip=True) if loc_tag else None
+        
+
+
+        if price or location:
             all_homes.append({
-                'Price':price
+                'Price':price,
+                'Location': location
             })
     
 df = pd.DataFrame(all_homes)
