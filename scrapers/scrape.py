@@ -43,15 +43,37 @@ for page in range(START_PAGE, END_PAGE):
 
         loc_tag = card.find('div', {'aria-label': 'Location'})
         location = loc_tag.get_text(strip=True) if loc_tag else None
-        
 
+        beds_tag = card.find('span', {'aria-label': 'Beds'})
+        beds = beds_tag.get_text(strip=True) if beds_tag else None
+
+        baths_tag = card.find('span', {'aria-label': 'Baths'})
+        baths = baths_tag.get_text(strip=True) if baths_tag else None
+
+        area_tag = card.find('span', {'aria-label': 'Area'})
+        area = area_tag.get_text(strip=True) if area_tag else None
+
+        link_tag = card.find('a', href=True)
+        listing_url =None
+
+        if link_tag:
+            href = link_tag['href']
+            listing_url = (
+                f'https://www.zameen.com{href}' if href.startswith('/') else href
+            )
 
         if price or location:
             all_homes.append({
                 'Price':price,
-                'Location': location
+                'Location': location,
+                'Beds': beds,
+                'Baths': baths,
+                "Area": area,
+                "URL": listing_url
             })
     
 df = pd.DataFrame(all_homes)
 
-print(df)
+# df.to_csv('data/raw/checking.csv', index=False)
+
+print(df['URL'])
