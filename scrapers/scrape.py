@@ -2,6 +2,7 @@ import pandas as pd
 import numpy as np
 import requests
 from bs4 import BeautifulSoup
+import time
 
 base_url = "https://www.zameen.com/Homes/Islamabad-3-{}.html"
 
@@ -24,6 +25,9 @@ headers = {
 }
 
 all_homes= []
+
+session = requests.Session()
+session.headers.update(headers)
 
 for page in range(START_PAGE, END_PAGE):
     print(f"Scraping page {page}...")
@@ -61,19 +65,39 @@ for page in range(START_PAGE, END_PAGE):
             listing_url = (
                 f'https://www.zameen.com{href}' if href.startswith('/') else href
             )
+        
+        description = None
+
+        if listing_url:
+            try:
+                detail_res = session.get(listing_url, timeout=10)
+
+                if detail_res.status_code == 200:
+                    detail_soup = BeautifulSoup(detail_res.text, 'lxml')
+
+                    desc_tag = detail_soup.find('div', {'aria-label': 'Property description'})
+                    description = desc_tag.get_text(strip=True) if desc_tag else None
+
+                    type_tag = detail_soup.find('span', {'aria-label': 'Type'})
+                    type = type_tag.get_text(strip=True) if type_tag else None
+            except Exception as e:
+                print("Failed to fetch")
 
         if price or location:
             all_homes.append({
+                'Type': type,
                 'Price':price,
                 'Location': location,
                 'Beds': beds,
                 'Baths': baths,
                 "Area": area,
-                "URL": listing_url
+                "URL": listing_url,
+                'Description': description
             })
+    time.sleep(1)
     
 df = pd.DataFrame(all_homes)
 
-# df.to_csv('data/raw/checking.csv', index=False)
+df.to_csv('data/raw/checking.csv', index=False)
 
-print(df['URL'])
+print(df)
