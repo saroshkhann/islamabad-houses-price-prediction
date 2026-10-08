@@ -7,7 +7,7 @@ import time
 base_url = "https://www.zameen.com/Homes/Islamabad-3-{}.html"
 
 START_PAGE =1
-END_PAGE =6
+END_PAGE =11
 
 headers = {
     'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/128.0.0.0 Safari/537.36',
@@ -80,6 +80,7 @@ for page in range(START_PAGE, END_PAGE):
 
                     type_tag = detail_soup.find('span', {'aria-label': 'Type'})
                     type = type_tag.get_text(strip=True) if type_tag else None
+
             except Exception as e:
                 print("Failed to fetch")
 
